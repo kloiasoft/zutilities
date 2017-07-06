@@ -1,4 +1,4 @@
-package com.tigillo.z.zutilities.ftp;
+package com.kloia.z.zutilities.ftp;
 
 public class FTPCommandFailedException extends Exception {
 	private static final long serialVersionUID = 4057174989203583081L;

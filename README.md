@@ -1,29 +1,28 @@
 # ZUtilities
 This is the utility to connect to Z/OS over FTP JESInterface and to submit JCL jobs and to retvieve spool files.
 
-## Initialize FTP Connection
+## Initialize FTP Connection Manager
 ```
-  FTPConnectionManager.initializeFTPConnectionManager(ftpHostName, ftpUser, ftpPassword);
+   FTPConnectionManager ftpConnectionManager = new FTPConnectionManager(ftpHostName, ftpUser, ftpPassword);
 ```
 
 ## Submit A Job
 ```
-  public void submitjob(File jclFile) throws JobSubmitException, IOException {
+  public void submitjob(FTPConnectionManager ftpConnectionManager, File jclFile) throws JobSubmitException, IOException {
     Job job = new Job(jclFile);
-    job.submit();
+    job.submit(ftpConnectionManager);
     out.println("Job submitted with job id: '" +job.getJobId() + "'.");
   }
 ```
 
 ## Submit A Job With Dynamic Content Creation
 ```
-  public void submitjob(String jclContent) throws JobSubmitException, IOException {
-
+  public void submitjob(FTPConnectionManager ftpConnectionManager, String jclContent) throws JobSubmitException, IOException {
     File jclFile = File.createTempFile("tmpJcl", null);
     OutputStream outputStream = new FileOutputStream(jclFile);
     outputStream.write(jclContent.getBytes());
     Job job = new Job(jclFile);
-    job.submit();
+    job.submit(ftpConnectionManager);
     outputStream.flush();
     outputStream.close();
     outputStream = null;
@@ -33,8 +32,8 @@ This is the utility to connect to Z/OS over FTP JESInterface and to submit JCL j
 
 ## Get Job Result
 ```
-  public void getJobResult(Job job) throws SpoolFileRetrieveException, JobStateRefreshException, JobStepRetrieveFailedException {
-    job.refreshJobState();
+  public void getJobResult(FTPConnectionManager ftpConnectionManager, Job job) throws SpoolFileRetrieveException, JobStateRefreshException, JobStepRetrieveFailedException {
+    job.refreshJobState(ftpConnectionManager);
     if(job.getStatus().equals(Job.Status.INPUT)) {
       System.out.println("Job is waiting in the queue...");
     }
@@ -49,7 +48,7 @@ This is the utility to connect to Z/OS over FTP JESInterface and to submit JCL j
       
       for (int i = 0; i < spoolFiles.size(); i++) {
         System.out.println("Retrieving job spool file '" + spoolFiles.get(i).getDataDefinitionName() + "'...");
-        job.retrieveSpoolFile(spoolFiles.get(i), "/tmp/", "filename");
+        job.retrieveSpoolFile(ftpConnectionManager, spoolFiles.get(i), "/tmp/", "filename");
       }
       
       System.out.println("Analysing jes message log...");

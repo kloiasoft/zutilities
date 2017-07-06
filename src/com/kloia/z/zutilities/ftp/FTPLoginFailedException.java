@@ -1,4 +1,4 @@
-package com.tigillo.z.zutilities.ftp;
+package com.kloia.z.zutilities.ftp;
 
 public class FTPLoginFailedException extends Exception {
 

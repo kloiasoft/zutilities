@@ -1,4 +1,4 @@
-package com.tigillo.z.zutilities.ftp;
+package com.kloia.z.zutilities.ftp;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,25 +11,25 @@ import org.apache.commons.net.ftp.FTPReply;
 
 
 public class FTPConnectionManager {
-	private static FTPClient ftpClient;
-	private static String ftpHostName;
-	private static String ftpUser;
-	private static String ftpPassword;
+	private FTPClient ftpClient;
+	private String ftpHostName;
+	private String ftpUser;
+	private String ftpPassword;
 	private final static int PATHNAME_ALREADY_EXISTS = 521;
-	
-	public static FTPClient initializeFTPConnectionManager(String ftpHostName, String ftpUser, String ftpPassword) throws FTPConnectionNotAvailableException {
-		FTPConnectionManager.ftpHostName = ftpHostName;
-		FTPConnectionManager.ftpUser = ftpUser;
-		FTPConnectionManager.ftpPassword = ftpPassword;
-		return getFTPClient();
+
+	public FTPConnectionManager(String ftpHostName, String ftpUser, String ftpPassword) {
+		this.ftpHostName = ftpHostName;
+		this.ftpUser = ftpUser;
+		this.ftpPassword = ftpPassword;
 	}
-	public static String getFtpHostName() {
+
+	public String getFtpHostName() {
 		return ftpHostName;
 	}
-	public static String getFtpUser() {
+	public String getFtpUser() {
 		return ftpUser;
 	}
-	public static FTPClient getFTPClient() throws FTPConnectionNotAvailableException {
+	public FTPClient getFTPClient() throws FTPConnectionNotAvailableException {
 		try
 		{
 			if(ftpClient==null) ftpClient = new FTPClient();
@@ -46,7 +46,7 @@ public class FTPConnectionManager {
 		return ftpClient;
 	}
 
-	public static FTPClient getFTPClientForJESFile() throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public FTPClient getFTPClientForJESFile() throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		getFTPClient();
 		try
 		{
@@ -60,7 +60,7 @@ public class FTPConnectionManager {
 		return ftpClient;
 	}
 
-	public static FTPClient getFTPClienForSEQFile() throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public FTPClient getFTPClienForSEQFile() throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		getFTPClient();
 		try
 		{
@@ -74,7 +74,7 @@ public class FTPConnectionManager {
 		return ftpClient;
 	}
 	
-	public static void changeToRootDirectory() throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public void changeToRootDirectory() throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		getFTPClienForSEQFile();
 		try
 		{
@@ -90,7 +90,7 @@ public class FTPConnectionManager {
 		}
 	}
 	
-	public static void storeSEQFile(String localFilePath, String remoteFilePath, boolean makeDirectory) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public void storeSEQFile(String localFilePath, String remoteFilePath, boolean makeDirectory) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		changeToRootDirectory();
 		try
 		{
@@ -109,11 +109,11 @@ public class FTPConnectionManager {
 		}
 	}
 	
-	public static void storeSEQFile(String localFilePath, String remoteFilePath) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public void storeSEQFile(String localFilePath, String remoteFilePath) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		storeSEQFile(localFilePath, remoteFilePath, true);
 	}
 	
-	public static void retrieveSEQFile(String remoteFilePath, String localFilePath) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public void retrieveSEQFile(String remoteFilePath, String localFilePath) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		changeToRootDirectory();
 		try
 		{
@@ -134,7 +134,7 @@ public class FTPConnectionManager {
 	}
 		
 	
-	public static void deleteSEQFile(String remoteFilePath) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
+	public void deleteSEQFile(String remoteFilePath) throws FTPConnectionNotAvailableException, FTPCommandFailedException {
 		changeToRootDirectory();
 		try
 		{
@@ -147,7 +147,7 @@ public class FTPConnectionManager {
 		}
 	}
 	
-	public static boolean closeFTPClient() {	
+	public boolean closeFTPClient() {	
 		try
 		{
 			ftpClient.disconnect();
@@ -160,7 +160,7 @@ public class FTPConnectionManager {
 		}
 	}
 	
-	private static boolean isAvailable() {	
+	private boolean isAvailable() {	
 		try
 		{
 			ftpClient.listNames();			

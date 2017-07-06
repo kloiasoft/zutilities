@@ -1,4 +1,4 @@
-package com.tigillo.z.zutilities.jes;
+package com.kloia.z.zutilities.jes;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,7 +14,7 @@ import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
-import com.tigillo.z.zutilities.ftp.FTPConnectionManager;
+import com.kloia.z.zutilities.ftp.FTPConnectionManager;
 
 public class Job {
 	private File jclFile;
@@ -143,10 +143,10 @@ public class Job {
 		this.steps = steps;
 	}
 
-	public void submit() throws JobSubmitException {
+	public void submit(FTPConnectionManager ftpConnectionManager) throws JobSubmitException {
 		
 		try {
-			FTPClient ftpClient = FTPConnectionManager.getFTPClientForJESFile(); 
+			FTPClient ftpClient = ftpConnectionManager.getFTPClientForJESFile();
 	        FileInputStream inputStream = new FileInputStream(jclFile.getAbsolutePath());
 	        ftpClient.storeFile(ftpClient.getRemoteAddress().getHostName(),inputStream);	        
 	        if(ftpClient.getReplyCode() == FTPReply.FILE_ACTION_OK) {
@@ -159,10 +159,10 @@ public class Job {
         }
 	}
 
-	public void refreshJobState() throws JobStateRefreshException
+	public void refreshJobState(FTPConnectionManager ftpConnectionManager) throws JobStateRefreshException
 	{
 		try {
-			FTPClient ftpClient = FTPConnectionManager.getFTPClientForJESFile();
+			FTPClient ftpClient = ftpConnectionManager.getFTPClientForJESFile();
 			ftpClient.site("jesowner=*");
 			ftpClient.site("jesjobname=*");
 			FTPClientConfig conf = new FTPClientConfig("JesSingleFileParser");
@@ -185,9 +185,9 @@ public class Job {
         }
 	}
 
-	public void retrieveSpoolFile(SpoolFile spoolFile, String outputPath, String prefix) throws SpoolFileRetrieveException { 
+	public void retrieveSpoolFile(FTPConnectionManager ftpConnectionManager, SpoolFile spoolFile, String outputPath, String prefix) throws SpoolFileRetrieveException {
 		try {
-			FTPClient ftpClient = FTPConnectionManager.getFTPClientForJESFile();
+			FTPClient ftpClient = ftpConnectionManager.getFTPClientForJESFile();
 			ftpClient.site("jesowner=*");
 			File outputFile = new File(outputPath);;
 			if(prefix==null) prefix = jobName;
@@ -197,7 +197,7 @@ public class Job {
 			String procStep = spoolFile.getProcedureStep() + ".";
 			if(procStep.equals("."))
 				procStep = "";
-		    outputFile = new File(outputFile.getAbsolutePath()+ "\\" + prefix + "." + procStep + spoolFile.getDataDefinitionName());
+		    outputFile = new File(outputFile.getAbsolutePath() + File.separator + prefix + "." + procStep + spoolFile.getDataDefinitionName());
 		    outputFile.createNewFile();
 		    OutputStream outStream = new FileOutputStream(outputFile);
 			ftpClient.retrieveFile(jobId+"."+spoolFile.getId(), outStream);
@@ -262,10 +262,10 @@ public class Job {
 			throw new JobStepRetrieveFailedException(jobId, e);
 		}
 	}
-	public void delete() throws JobDeleteException
+	public void delete(FTPConnectionManager ftpConnectionManager) throws JobDeleteException
 	{
 		try {
-			FTPClient ftpClient = FTPConnectionManager.getFTPClientForJESFile();
+			FTPClient ftpClient = ftpConnectionManager.getFTPClientForJESFile();
 	        ftpClient.deleteFile(jobId);
 	        if(ftpClient.getReplyCode() != FTPReply.FILE_ACTION_OK)
 		        throw new IOException(ftpClient.getReplyString());
